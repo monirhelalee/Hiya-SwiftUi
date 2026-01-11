@@ -13,6 +13,7 @@ struct ContentView: View {
     private var session = LanguageModelSession()
     
     @State private var response: String = ""
+    @State private var isLoading: Bool = false
     
     var body: some View {
         VStack {
@@ -20,10 +21,25 @@ struct ContentView: View {
             
             switch largeLamguageModel.availability{
             case .available:
-                Text(response)
-                    .multilineTextAlignment(.center)
-                    .font(.largeTitle)
-                    .bold()
+                if response.isEmpty{
+                    if isLoading{
+                        ProgressView()
+                    }else{
+                        Text("Tap the button to get a fun response")
+                            .foregroundStyle(.tertiary)
+                            .multilineTextAlignment(.center)
+                            .font(.title)
+                    }
+                }else{
+                    if isLoading{
+                        ProgressView()
+                    }else{
+                        Text(response)
+                            .multilineTextAlignment(.center)
+                            .font(.largeTitle)
+                            .bold()
+                    }
+                }
             case .unavailable(.deviceNotEligible):
                 Text("Your Device is not eligible for Apple Inteligent.")
             case .unavailable(.appleIntelligenceNotEnabled):
@@ -37,6 +53,9 @@ struct ContentView: View {
                 
             Button{
                 Task{
+                    isLoading = true
+                    defer { isLoading = false }
+                    
                     let prompt = "Say hi in fun way."
                     
                     do{
